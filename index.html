@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Сайт с историями</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .story-container {
+            background-color: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .story-title {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .story-text {
+            line-height: 1.6;
+            color: #444;
+        }
+        .nav-menu {
+            background-color: #333;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 20px;
+        }
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+        .nav-menu a:hover {
+            color: #ffd700;
+        }
+        .story-form {
+            background-color: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .story-form h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #444;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .form-group textarea {
+            height: 200px;
+            resize: vertical;
+        }
+        .submit-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .submit-button:hover {
+            background-color: #45a049;
+        }
+        .story-author {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        
+        .story-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .like-button, .share-button {
+            padding: 5px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .like-button {
+            background-color: #ff4d4d;
+            color: white;
+            padding: 5px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .like-button.liked {
+            background-color: #ff3333;
+            opacity: 0.8;
+        }
+        
+        .like-button[disabled] {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .like-button:hover:not([disabled]) {
+            background-color: #ff3333;
+        }
+        
+        .share-button {
+            background-color: #4d79ff;
+            color: white;
+        }
+        
+        .share-button:hover {
+            background-color: #3366ff;
+        }
+        
+        .stories-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .message {
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin: 10px 0;
+            display: none;
+        }
+        
+        .success-message {
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        
+        .error-message {
+            background-color: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+        
+        .form-group .error {
+            color: #a94442;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        .search-container {
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        #searchInput {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        #searchInput:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 2px 8px rgba(76,175,80,0.2);
+            outline: none;
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+        
+        .story-container.hidden {
+            display: none;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+            display: none;
+        }
+        .auth-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .auth-container.active {
+            display: block;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .auth-info {
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .auth-info.active {
+            display: flex;
+        }
+        
+        .logout-button {
+            background-color: #ff4444;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        #myStoriesBtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        #myStoriesBtn:hover {
+            background-color: #45a049;
+        }
+        
+        .nav-menu button.active {
+            background-color: #45a049;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .no-stories-message {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-menu">
+        <ul>
+            <li><a href="#home">Главная</a></li>
+            <li><a href="#stories">Все истории</a></li>
+            <li><a href="#new">Новые истории</a></li>
+            <li><a href="#popular">Популярные</a></li>
+            <li><a href="#about">О нас</a></li>
+            <li><button id="myStoriesBtn" onclick="showMyStories()" style="display: none;">Мои истории</button></li>
+            <li class="auth-buttons" id="authButtons">
+                <button onclick="showAuthForm('login')">Войти</button>
+                <button onclick="showAuthForm('register')">Регистрация</button>
+            </li>
+            <li class="auth-info" id="authInfo">
+                <span class="user-name" id="userName"></span>
+                <button class="logout-button" onclick="logout()">Выйти</button>
+            </li>
+        </ul>
+    </nav>
+    
+    <h1>Добро пожаловать в мир историй</h1>
+    
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Поиск по названию, автору или тексту истории...">
+        <span class="search-icon">🔍</span>
+    </div>
+    
+    <div id="noResults" class="no-results">
+        Истории не найдены
+    </div>
+
+    <!-- Добавляем контейнер для историй -->
+    <div class="stories-container">
+        <!-- Существующие истории -->
+        <div class="story-container">
+            <h2 class="story-title">История 1</h2>
+            <div class="story-text">
+                В один прекрасный день в маленьком городке случилось нечто необычное. 
+                Все жители проснулись и обнаружили, что их дома окрасились в разные цвета радуги. 
+                Никто не знал, как это произошло, но этот день навсегда изменил жизнь горожан...
+            </div>
+        </div>
+
+        <div class="story-container">
+            <h2 class="story-title">История 2</h2>
+            <div class="story-text">
+                На окраине леса жил старый мудрец, который знал язык животных. 
+                Каждое утро к нему приходили лесные жители и рассказывали свои истории. 
+                Однажды произошло что-то совершенно удивительное...
+            </div>
+        </div>
+    </div>
+
+    <div class="story-form">
+        <h2>Добавить новую историю</h2>
+        <div id="successMessage" class="message success-message">История успешно добавлена!</div>
+        <div id="errorMessage" class="message error-message"></div>
+        <form id="newStoryForm">
+            <div class="form-group">
+                <label for="storyTitle">Название истории:</label>
+                <input type="text" id="storyTitle" name="storyTitle" required>
+                <div class="error" id="titleError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="storyText">Текст истории:</label>
+                <textarea id="storyText" name="storyText" required></textarea>
+                <div class="error" id="textError"></div>
+            </div>
+            
+            <button type="submit" class="submit-button">Опубликовать историю</button>
+        </form>
+    </div>
+
+    <div class="auth-container" id="authContainer">
+        <h2 id="authTitle">Вход</h2>
+        <form id="authForm">
+            <div class="form-group">
+                <label for="username">Имя пользователя:</label>
+                <input type="text" id="username" name="username" required>
+                <div class="error" id="usernameError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" name="password" required>
+                <div class="error" id="passwordError"></div>
+            </div>
+            
+            <button type="submit" class="submit-button">Войти</button>
+        </form>
+    </div>
+
+    <script>
+        function validateStory(data) {
+            let isValid = true;
+            const errors = {};
+            
+            // Валидация названия
+            if (data.storyTitle.length < 3) {
+                errors.title = 'Название должно содержать минимум 3 символа';
+                isValid = false;
+            } else if (data.storyTitle.length > 100) {
+                errors.title = 'Название не должно превышать 100 символов';
+                isValid = false;
+            }
+            
+            // Валидация текста истории
+            if (data.storyText.length < 10) {
+                errors.text = 'История должна содержать минимум 10 символов';
+                isValid = false;
+            } else if (data.storyText.length > 5000) {
+                errors.text = 'История не должна превышать 5000 символов';
+                isValid = false;
+            }
+            
+            return { isValid, errors };
+        }
+
+        function showError(fieldId, message) {
+            const errorDiv = document.getElementById(`${fieldId}Error`);
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function clearErrors() {
+            const errorDivs = document.querySelectorAll('.error');
+            errorDivs.forEach(div => div.style.display = 'none');
+        }
+
+        function showMessage(type, message) {
+            const successMsg = document.getElementById('successMessage');
+            const errorMsg = document.getElementById('errorMessage');
+            
+            successMsg.style.display = 'none';
+            errorMsg.style.display = 'none';
+            
+            if (type === 'success') {
+                successMsg.style.display = 'block';
+            } else {
+                errorMsg.textContent = message;
+                errorMsg.style.display = 'block';
+            }
+            
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+                errorMsg.style.display = 'none';
+            }, 3000);
+        }
+
+        // Функция для сохранения историй в localStorage
+        function saveStoriesToLocalStorage(stories) {
+            localStorage.setItem('stories', JSON.stringify(stories));
+        }
+
+        // Функция для получения историй из localStorage
+        function getStoriesFromLocalStorage() {
+            const stories = localStorage.getItem('stories');
+            return stories ? JSON.parse(stories) : [];
+        }
+
+        // Обновляем функцию отображения историй
+        function displayStories(storiesFilter = null) {
+            const storiesContainer = document.querySelector('.stories-container');
+            const stories = getStoriesFromLocalStorage();
+            const currentUser = getCurrentUser();
+            
+            // Фильтруем истории, если указан фильтр
+            const filteredStories = storiesFilter ? 
+                stories.filter(storiesFilter) : 
+                stories;
+            
+            storiesContainer.innerHTML = ''; // Очищаем контейнер
+            
+            if (filteredStories.length === 0) {
+                storiesContainer.innerHTML = `
+                    <div class="no-stories-message">
+                        ${storiesFilter ? 'У вас пока нет историй' : 'Историй пока нет'}
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredStories.forEach(story => {
+                const hasLiked = currentUser && story.likedBy && story.likedBy.includes(currentUser.username);
+                const likeButtonClass = hasLiked ? 'like-button liked' : 'like-button';
+                const likeButtonDisabled = !currentUser ? 'disabled' : '';
+                const likeTitle = !currentUser ? 'Войдите, чтобы поставить лайк' : 
+                                hasLiked ? 'Нажмите, чтобы убрать лайк' : 'Нажмите, чтобы поставить лайк';
+                
+                const storyHTML = `
+                    <div class="story-container">
+                        <h2 class="story-title">${story.storyTitle}</h2>
+                        <p class="story-author">Автор: ${story.authorName}</p>
+                        <div class="story-text">${story.storyText}</div>
+                        <div class="story-actions">
+                            <button class="${likeButtonClass}" ${likeButtonDisabled} 
+                                title="${likeTitle}"
+                            >❤ ${story.likes || 0}</button>
+                            <button class="share-button">Поделиться</button>
+                        </div>
+                    </div>
+                `;
+                storiesContainer.insertAdjacentHTML('afterbegin', storyHTML);
+            });
+        }
+
+        // Обновляем функцию для отображения историй пользователя
+        function showMyStories() {
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                showMessage('error', 'Необходимо войти в систему');
+                return;
+            }
+            
+            // Обновляем активное состояние кнопок
+            const allButtons = document.querySelectorAll('.nav-menu button, .nav-menu a');
+            allButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById('myStoriesBtn').classList.add('active');
+            
+            // Фильтруем и отображаем только истории текущего пользователя
+            displayStories(story => story.authorName === currentUser.username);
+            
+            showMessage('success', 'Показаны ваши истории');
+        }
+
+        // Добавляем обработчик для кнопки "Все истории"
+        document.querySelector('a[href="#stories"]').addEventListener('click', (e) => {
+            e.preventDefault();
+            const allButtons = document.querySelectorAll('.nav-menu button, .nav-menu a');
+            allButtons.forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            displayStories();
+        });
+
+        // Обновляем обработчик отправки формы
+        document.getElementById('newStoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearErrors();
+            
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                showMessage('error', 'Необходимо войти в систему');
+                return;
+            }
+            
+            const formData = new FormData(e.target);
+            const storyData = Object.fromEntries(formData);
+            
+            const { isValid, errors } = validateStory(storyData);
+            
+            if (!isValid) {
+                Object.keys(errors).forEach(key => {
+                    showError(key, errors[key]);
+                });
+                return;
+            }
+            
+            try {
+                const newStory = {
+                    ...storyData,
+                    authorName: currentUser.username,
+                    date: new Date().toISOString(),
+                    likes: 0,
+                    likedBy: []
+                };
+                
+                const stories = getStoriesFromLocalStorage();
+                stories.unshift(newStory);
+                saveStoriesToLocalStorage(stories);
+                
+                displayStories();
+                e.target.reset();
+                showMessage('success');
+            } catch (error) {
+                console.error('Ошибка при добавлении истории:', error);
+                showMessage('error', 'Произошла ошибка при добавлении истории');
+            }
+        });
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function searchStories(query) {
+            const stories = document.querySelectorAll('.story-container');
+            const noResults = document.getElementById('noResults');
+            let hasVisibleStories = false;
+            
+            stories.forEach(story => {
+                const title = story.querySelector('.story-title').textContent.toLowerCase();
+                const text = story.querySelector('.story-text').textContent.toLowerCase();
+                const author = story.querySelector('.story-author')?.textContent.toLowerCase() || '';
+                
+                const searchQuery = query.toLowerCase();
+                
+                if (title.includes(searchQuery) || 
+                    text.includes(searchQuery) || 
+                    author.includes(searchQuery)) {
+                    story.classList.remove('hidden');
+                    hasVisibleStories = true;
+                } else {
+                    story.classList.add('hidden');
+                }
+            });
+            
+            noResults.style.display = hasVisibleStories ? 'none' : 'block';
+        }
+
+        // Добавляем обработчик события с debounce
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', debounce((e) => {
+            searchStories(e.target.value);
+        }, 300));
+
+        // Добавляем обработчик для очистки поиска
+        searchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Escape') {
+                searchInput.value = '';
+                searchStories('');
+            }
+        });
+
+        // Функции для работы с пользователями в localStorage
+        function saveUsers(users) {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        function getUsers() {
+            return JSON.parse(localStorage.getItem('users') || '[]');
+        }
+
+        function getCurrentUser() {
+            return JSON.parse(localStorage.getItem('currentUser'));
+        }
+
+        function setCurrentUser(user) {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            updateAuthUI();
+        }
+
+        // Обновление UI в зависимости от состояния авторизации
+        function updateAuthUI() {
+            const currentUser = getCurrentUser();
+            const authButtons = document.getElementById('authButtons');
+            const authInfo = document.getElementById('authInfo');
+            const userName = document.getElementById('userName');
+            const storyForm = document.querySelector('.story-form');
+            const myStoriesBtn = document.getElementById('myStoriesBtn');
+            
+            if (currentUser) {
+                authButtons.style.display = 'none';
+                authInfo.classList.add('active');
+                userName.textContent = currentUser.username;
+                storyForm.style.display = 'block';
+                myStoriesBtn.style.display = 'block';
+            } else {
+                authButtons.style.display = 'flex';
+                authInfo.classList.remove('active');
+                userName.textContent = '';
+                storyForm.style.display = 'none';
+                myStoriesBtn.style.display = 'none';
+                // При выходе показываем все истории
+                displayStories();
+            }
+        }
+
+        // Показать форму авторизации/регистрации
+        function showAuthForm(type) {
+            const authContainer = document.getElementById('authContainer');
+            const authTitle = document.getElementById('authTitle');
+            const authForm = document.getElementById('authForm');
+            
+            authContainer.classList.add('active');
+            authTitle.textContent = type === 'login' ? 'Вход' : 'Регистрация';
+            authForm.dataset.type = type;
+        }
+
+        // Обработка формы авторизации/регистрации
+        document.getElementById('authForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const type = e.target.dataset.type;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (type === 'register') {
+                // Регистрация
+                const users = getUsers();
+                if (users.some(u => u.username === username)) {
+                    showError('username', 'Пользователь с таким именем уже существует');
+                    return;
+                }
+                
+                const newUser = { username, password };
+                users.push(newUser);
+                saveUsers(users);
+                setCurrentUser(newUser);
+                showMessage('success', 'Регистрация успешна!');
+            } else {
+                // Вход
+                const users = getUsers();
+                const user = users.find(u => u.username === username && u.password === password);
+                
+                if (user) {
+                    setCurrentUser(user);
+                    showMessage('success', 'Вход выполнен успешно!');
+                } else {
+                    showMessage('error', 'Неверное имя пользователя или пароль');
+                    return;
+                }
+            }
+            
+            document.getElementById('authContainer').classList.remove('active');
+            e.target.reset();
+        });
+
+        // Выход из системы
+        function logout() {
+            localStorage.removeItem('currentUser');
+            updateAuthUI();
+            showMessage('success', 'Вы вышли из системы');
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAuthUI();
+            displayStories();
+        });
+    </script>
+</body>
+</html> 
